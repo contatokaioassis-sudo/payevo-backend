@@ -1,10 +1,35 @@
+import express from "express";
+import axios from "axios";
+import cors from "cors";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+const app = express();
+
+// ✅ CORS agora totalmente liberado e configurado
+app.use(cors({
+  origin: "*",
+  methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));
+
+app.use(express.json());
+
+const PAYEVO_SECRET = process.env.PAYER_SECRET_KEY;
+const PAYEVO_COMPANY = process.env.PAYER_COMPANY_ID;
+
+app.get("/", (req, res) => {
+  res.send("Payevo backend is running!");
+});
+
 // 📌 Criar cobrança PIX
 app.post("/pix/create", async (req, res) => {
   try {
     const { amount, userId } = req.body;
 
     const response = await axios.post(
-      "https://api.payevo.app/pix/create",
+      "https://api.likepix.com/api/v1/charge/create",
       {
         amount,
         company_id: PAYEVO_COMPANY,
@@ -22,6 +47,7 @@ app.post("/pix/create", async (req, res) => {
       txid: response.data.txid,
       status: "pending",
     });
+
   } catch (error) {
     console.error(error.response?.data || error);
     res.status(500).json({ error: "Erro ao criar cobrança PIX" });
@@ -34,7 +60,7 @@ app.post("/pix/status", async (req, res) => {
     const { txid } = req.body;
 
     const response = await axios.post(
-      "https://api.payevo.app/pix/status",
+      "https://api.likepix.com/api/v1/charge/status",
       { txid, company_id: PAYEVO_COMPANY },
       {
         headers: {
@@ -47,8 +73,12 @@ app.post("/pix/status", async (req, res) => {
       status: response.data.status,
       paid_at: response.data.paid_at,
     });
+
   } catch (error) {
     console.error(error.response?.data || error);
     res.status(500).json({ error: "Erro ao consultar status PIX" });
   }
 });
+
+const port = process.env.PORT || 3000;
+app.listen(port, () => console.log(`🚀 Server running on port ${port}`));
