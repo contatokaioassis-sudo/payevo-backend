@@ -1,28 +1,10 @@
-import express from "express";
-import axios from "axios";
-import cors from "cors";
-import dotenv from "dotenv";
-
-dotenv.config();
-
-const app = express();
-app.use(express.json());
-app.use(cors());
-
-const PAYEVO_SECRET = process.env.PAYER_SECRET_KEY;
-const PAYEVO_COMPANY = process.env.PAYER_COMPANY_ID;
-
-app.get("/", (req, res) => {
-  res.send("Payevo backend is running!");
-});
-
 // 📌 Criar cobrança PIX
 app.post("/pix/create", async (req, res) => {
   try {
     const { amount, userId } = req.body;
 
     const response = await axios.post(
-      "https://api.payevo.com/pix/create",
+      "https://api.payevo.app/pix/create",
       {
         amount,
         company_id: PAYEVO_COMPANY,
@@ -52,7 +34,7 @@ app.post("/pix/status", async (req, res) => {
     const { txid } = req.body;
 
     const response = await axios.post(
-      "https://api.payevo.com/pix/status",
+      "https://api.payevo.app/pix/status",
       { txid, company_id: PAYEVO_COMPANY },
       {
         headers: {
@@ -70,6 +52,3 @@ app.post("/pix/status", async (req, res) => {
     res.status(500).json({ error: "Erro ao consultar status PIX" });
   }
 });
-
-const port = process.env.PORT || 3000;
-app.listen(port, () => console.log(`🚀 Server running on port ${port}`));
