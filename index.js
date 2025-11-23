@@ -29,7 +29,7 @@ app.post("/pix/create", async (req, res) => {
     const { amount, userId } = req.body;
 
     const response = await axios.post(
-      ""https://api.payevo.com/pix/create"",
+      "https://api.payevo.com/pix/create",
       {
         amount,
         company_id: PAYEVO_COMPANY,
