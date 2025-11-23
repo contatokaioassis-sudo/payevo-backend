@@ -29,7 +29,8 @@ app.post("/pix/create", async (req, res) => {
     const { amount, userId } = req.body;
 
     const response = await axios.post(
-      "https://api.likepix.com/api/v1/charge/create",
+      ""https://api.payevo.com/pix/create"
+    ",
       {
         amount,
         company_id: PAYEVO_COMPANY,
@@ -60,7 +61,7 @@ app.post("/pix/status", async (req, res) => {
     const { txid } = req.body;
 
     const response = await axios.post(
-      "https://api.likepix.com/api/v1/charge/status",
+      "https://api.payevo.com/pix/status",
       { txid, company_id: PAYEVO_COMPANY },
       {
         headers: {
