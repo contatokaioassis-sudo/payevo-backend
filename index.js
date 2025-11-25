@@ -7,17 +7,20 @@ dotenv.config();
 
 const app = express();
 
-// ✅ CORS agora totalmente liberado e configurado
-app.use(cors({
-  origin: "*",
-  methods: ["GET", "POST", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-}));
+// CORS liberado
+app.use(
+  cors({
+    origin: "*",
+    methods: ["GET", "POST", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 app.use(express.json());
 
-const PAYEVO_SECRET = process.env.PAYER_SECRET_KEY;
-const PAYEVO_COMPANY = process.env.PAYER_COMPANY_ID;
+// 🔥 Variáveis corretas!
+const PAYEVO_SECRET = process.env.PAYEVO_SECRET_KEY;
+const PAYEVO_COMPANY = process.env.PAYEVO_COMPANY_ID;
 
 app.get("/", (req, res) => {
   res.send("Payevo backend is running!");
@@ -33,7 +36,7 @@ app.post("/pix/create", async (req, res) => {
       {
         amount,
         company_id: PAYEVO_COMPANY,
-        metadata: { userId }
+        metadata: { userId },
       },
       {
         headers: {
@@ -47,7 +50,6 @@ app.post("/pix/create", async (req, res) => {
       txid: response.data.txid,
       status: "pending",
     });
-
   } catch (error) {
     console.error(error.response?.data || error);
     res.status(500).json({ error: "Erro ao criar cobrança PIX" });
@@ -61,7 +63,10 @@ app.post("/pix/status", async (req, res) => {
 
     const response = await axios.post(
       "https://api.payevo.com/pix/status",
-      { txid, company_id: PAYEVO_COMPANY },
+      {
+        txid,
+        company_id: PAYEVO_COMPANY,
+      },
       {
         headers: {
           Authorization: `Bearer ${PAYEVO_SECRET}`,
@@ -73,7 +78,6 @@ app.post("/pix/status", async (req, res) => {
       status: response.data.status,
       paid_at: response.data.paid_at,
     });
-
   } catch (error) {
     console.error(error.response?.data || error);
     res.status(500).json({ error: "Erro ao consultar status PIX" });
