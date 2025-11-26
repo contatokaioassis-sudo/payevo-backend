@@ -17,8 +17,10 @@ const PAYEVO_BASE = "https://apiv2.payevo.com.br/functions/v1";
 
 // Auth PayEvo
 function basicAuth() {
-  return "Basic " + Buffer.from(PAYEVO_SECRET).toString("base64");
+  authorization: 'Basic ' + Buffer.from("{SECRET_KEY}:x").toString('base64')
+    }
 }
+
 
 // =====================================
 // 📌 Criar cobrança PIX
@@ -57,17 +59,18 @@ app.post("/pix/create", async (req, res) => {
     }
 
     const body = {
-      amount: Number(amount),
-      payment_type: "pix",
-      description: "Pagamento via PIX",
-      company_id: PAYEVO_COMPANY,
-      payer: {
-        name,
-        cpf_cnpj: String(cpf), // <--- GARANTE QUE NÃO É undefined
-        email,
-        phone
-      }
-    };
+    amount: Number(amount),
+    payment_type: "pix",
+    description: `Assinatura ${req.body.planName || "FitPremium"}`, // 🔥 OK
+    company_id: PAYEVO_COMPANY,
+    payer: {
+    name,
+    cpf_cnpj: String(cpf), // 🔥 GARANTE QUE NUNCA SERÁ undefined
+    email,
+    phone,
+  },
+};
+
 
     console.log("📤 Enviando para PayEvo:", body);
 
