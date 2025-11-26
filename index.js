@@ -16,19 +16,29 @@ const PAYEVO_COMPANY = process.env.PAYEVO_COMPANY_ID;
 
 const PAYEVO_BASE = "https://hub.payevo.com.br/functions/v1";
 
-// Auth correta
+// Auth correta — company_id:secret_key
 function basicAuth() {
   return "Basic " + Buffer.from(`${PAYEVO_COMPANY}:${PAYEVO_SECRET}`).toString("base64");
 }
 
 // ===============================
-// 📌 Criar PIX
+// 📌 Criar PIX (corrigido)
 // ===============================
 app.post("/pix/create", async (req, res) => {
   try {
-    const { amount, payer } = req.body;
+    console.log("📥 Recebido do FRONT:", req.body);
 
-    if (!amount || !payer?.name || !payer?.cpf_cnpj) {
+    const amount = req.body.amount;
+
+    // Aceita formato antigo e novo
+    const name  = req.body.payer?.name     || req.body.name;
+    const cpf   = req.body.payer?.cpf_cnpj || req.body.cpf;
+    const email = req.body.payer?.email    || req.body.email || null;
+    const phone = req.body.payer?.phone    || req.body.phone || null;
+
+    // Validação
+    if (!amount || !name || !cpf) {
+      console.log("❌ Falhou — campos inválidos");
       return res.status(400).json({
         error: "amount, name e cpf são obrigatórios"
       });
@@ -38,12 +48,14 @@ app.post("/pix/create", async (req, res) => {
       amount: Number(amount),
       company_id: PAYEVO_COMPANY,
       payer: {
-        name: payer.name,
-        cpf_cnpj: payer.cpf_cnpj,
-        email: payer.email ?? null,
-        phone: payer.phone ?? null
+        name,
+        cpf_cnpj: cpf,
+        email,
+        phone
       }
     };
+
+    console.log("📤 Enviando para PayEvo:", body);
 
     const response = await axios.post(`${PAYEVO_BASE}/pix/create`, body, {
       headers: {
@@ -52,11 +64,19 @@ app.post("/pix/create", async (req, res) => {
       }
     });
 
-    return res.json(response.data);
+    console.log("📥 Resposta da PayEvo:", response.data);
+
+    return res.json({
+      txid: response.data.txid,
+      qrcode: response.data.qrcode,
+      copiaecola: response.data.copiaecola
+    });
 
   } catch (error) {
+    console.error("❌ ERRO AO CRIAR PIX:", error.response?.data || error.message);
+
     return res.status(500).json({
-      error: "Erro ao criar PIX",
+      error: "Erro interno ao criar PIX",
       details: error.response?.data || error.message
     });
   }
@@ -69,13 +89,21 @@ app.post("/pix/status", async (req, res) => {
   try {
     const { txid } = req.body;
 
+    if (!txid) {
+      return res.status(400).json({ error: "txid obrigatório" });
+    }
+
+    console.log("📥 Consultando status:", txid);
+
     const response = await axios.get(`${PAYEVO_BASE}/pix/status/${txid}`, {
       headers: { Authorization: basicAuth() }
     });
 
-    res.json(response.data);
+    return res.json({ status: response.data.status });
 
   } catch (error) {
+    console.error("❌ ERRO AO CONSULTAR STATUS:", error.response?.data || error.message);
+
     res.status(500).json({
       error: "Erro ao consultar status",
       details: error.response?.data || error.message
@@ -85,4 +113,4 @@ app.post("/pix/status", async (req, res) => {
 
 // ===============================
 const port = process.env.PORT || 8080;
-app.listen(port, () => console.log("🔥 PayEvo backend ativo na porta", port));
+app.listen(port, () => console.log(`🔥 PayEvo backend ativo na porta ${port}`));
