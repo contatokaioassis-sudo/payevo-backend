@@ -21,7 +21,7 @@ app.use(express.urlencoded({ extended: true }));
 // 🔑 VARIÁVEIS PAYEVO
 const PAYEVO_SECRET = process.env.PAYEVO_SECRET_KEY;
 const PAYEVO_COMPANY = process.env.PAYEVO_COMPANY_ID;
-const PAYEVO_BASE = "https://apiv2.payevo.com.br/functions/v1";
+const PAYEVO_BASE = "https://hub.payevo.com.br/functions/v1/pix/create";
 
 // 🔐 AUTH PAYEVO
 function basicAuth() {
@@ -55,7 +55,7 @@ if (!amount || !name || !cpf) {
     // 🔥 Corpo conforme documentação OFICIAL
     const body = {
       amount: Number(amount),
-      company_id: PAYEVO_COMPANY,
+      company_id: 435a00aa-1c9d-42ee-9b31-71f34d653985,
       payer: {
         name,
         cpf_cnpj: cpf,
