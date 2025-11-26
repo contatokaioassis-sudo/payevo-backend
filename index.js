@@ -1,4 +1,3 @@
-// index.js — BACKEND PAYEVO CORRETÍSSIMO
 import express from "express";
 import axios from "axios";
 import cors from "cors";
@@ -8,95 +7,121 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors({ origin: "*", methods: ["POST", "GET"], allowedHeaders: ["Content-Type", "Authorization"] }));
+// 🔥 CORS LIBERADO
+app.use(cors({
+  origin: "*",
+  methods: ["GET", "POST"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
 
+// 🔥 OBRIGATÓRIO PARA RECEBER req.body !!!
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-
-// VARIÁVEIS CORRETAS
+// 🔑 VARIÁVEIS PAYEVO
 const PAYEVO_SECRET = process.env.PAYEVO_SECRET_KEY;
 const PAYEVO_COMPANY = process.env.PAYEVO_COMPANY_ID;
-
 const PAYEVO_BASE = "https://apiv2.payevo.com.br/functions/v1";
 
-// Auth básica no formato PayEvo
+// 🔐 AUTH PAYEVO
 function basicAuth() {
   return "Basic " + Buffer.from(PAYEVO_SECRET).toString("base64");
 }
 
-app.get("/", (req, res) => res.send("Payevo backend rodando 🚀"));
+app.get("/", (req, res) => {
+  res.send("🔥 PayEvo Backend ativo com sucesso!");
+});
 
-// ===========================
-// 1. GERAR PIX
-// ===========================
+// ===============================
+// 📌 1. Criar cobrança PIX
+// ===============================
 app.post("/pix/create", async (req, res) => {
   try {
+    console.log("📥 Recebido no backend:", req.body);
+
     const { amount, name, cpf, email, phone } = req.body;
 
+    // 🔎 Validação mínima
     if (!amount || !name || !cpf) {
-      return res.status(400).json({ error: "amount, name e cpf são obrigatórios" });
+      return res.status(400).json({
+        error: "amount, name e cpf são obrigatórios"
+      });
     }
 
-    const requestBody = {
-      amount,
-      company_id: 435a00aa-1c9d-42ee-9b31-71f34d653985,
+    // 🔥 Corpo conforme documentação OFICIAL
+    const body = {
+      amount: Number(amount),
+      company_id: PAYEVO_COMPANY,
       payer: {
         name,
         cpf_cnpj: cpf,
-        email,
-        phone
+        email: email ?? null,
+        phone: phone ?? null
       }
     };
 
-    console.log("➡ ENVIANDO PARA PAYEVO:", requestBody);
+    console.log("📤 Enviando para PayEvo:", body);
 
-    const response = await axios.post(
-      `${PAYEVO_BASE}/pix/create`,
-      requestBody,
-      {
-        headers: {
-          Authorization: basicAuth(),
-          "Content-Type": "application/json"
-        }
-      }
-    );
+    const response = await axios.post(`${PAYEVO_BASE}/pix/create`, body, {
+      headers: {
+        Authorization: basicAuth(),
+        "Content-Type": "application/json"
+      },
+      timeout: 20000
+    });
+
+    console.log("📥 Resposta PayEvo:", response.data);
 
     return res.json({
       txid: response.data.txid,
       qrcode: response.data.qrcode,
-      copia_cola: response.data.copia_cola
+      copiaecola: response.data.copiaecola
     });
 
-  } catch (err) {
-    console.error("❌ ERRO PAYEVO:", err.response?.data || err.message);
+  } catch (error) {
+    console.error("❌ ERRO AO CRIAR PIX:", error.response?.data || error.message);
+
     return res.status(500).json({
-      error: "Erro ao criar cobrança PIX",
-      details: err.response?.data
+      error: "Erro interno ao criar PIX",
+      details: error.response?.data || error.message
     });
   }
 });
 
-// ===========================
-// 2. STATUS
-// ===========================
+// ===============================
+// 📌 2. Consultar status
+// ===============================
 app.post("/pix/status", async (req, res) => {
   try {
     const { txid } = req.body;
 
-    const response = await axios.get(
-      `${PAYEVO_BASE}/pix/status/${txid}`,
-      {
-        headers: { Authorization: basicAuth() }
-      }
-    );
+    if (!txid) {
+      return res.status(400).json({ error: "txid obrigatório" });
+    }
+
+    const url = `${PAYEVO_BASE}/pix/status/${txid}`;
+
+    const response = await axios.get(url, {
+      headers: { Authorization: basicAuth() },
+      timeout: 15000
+    });
 
     return res.json({ status: response.data.status });
 
-  } catch (err) {
-    return res.status(500).json({ error: "Erro ao consultar status" });
+  } catch (error) {
+    console.error("❌ ERRO AO CONSULTAR STATUS:", error.response?.data || error.message);
+
+    return res.status(500).json({
+      error: "Erro ao consultar status PIX",
+      details: error.response?.data || error.message
+    });
   }
 });
 
-const port = process.env.PORT || 3000;
-app.listen(port, () => console.log(`🚀 Backend Payevo ligado na porta ${port}`));
+// ===============================
+// 🚀 SERVIDOR
+// ===============================
+const port = process.env.PORT || 8080; 
+app.listen(port, () => {
+  console.log(`🔥 Backend PayEvo rodando na porta ${port}`);
+});
