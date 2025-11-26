@@ -59,7 +59,7 @@ if (!amount || !name || !cpf) {
     // 🔥 Corpo conforme documentação OFICIAL
     const body = {
       amount: Number(amount),
-      company_id: 435a00aa-1c9d-42ee-9b31-71f34d653985,
+      company_id: COMPANY_ID,
       payer: {
         name,
         cpf_cnpj: cpf,
