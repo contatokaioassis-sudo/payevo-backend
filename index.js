@@ -39,14 +39,18 @@ app.post("/pix/create", async (req, res) => {
   try {
     console.log("📥 Recebido no backend:", req.body);
 
-    const { amount, name, cpf, email, phone } = req.body;
+    const amount = req.body.amount;
+const name = req.body.payer?.name;
+const cpf = req.body.payer?.cpf_cnpj;
+const email = req.body.payer?.email;
+const phone = req.body.payer?.phone;
 
-    // 🔎 Validação mínima
-    if (!amount || !name || !cpf) {
-      return res.status(400).json({
-        error: "amount, name e cpf são obrigatórios"
-      });
-    }
+if (!amount || !name || !cpf) {
+  return res.status(400).json({
+    error: "amount, name e cpf são obrigatórios"
+  });
+}
+
 
     // 🔥 Corpo conforme documentação OFICIAL
     const body = {
