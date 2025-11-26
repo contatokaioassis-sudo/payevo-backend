@@ -40,7 +40,7 @@ app.post("/pix/create", async (req, res) => {
 
     const requestBody = {
       amount,
-      company_id: PAYEVO_COMPANY,
+      company_id: 435a00aa-1c9d-42ee-9b31-71f34d653985,
       payer: {
         name,
         cpf_cnpj: cpf,
