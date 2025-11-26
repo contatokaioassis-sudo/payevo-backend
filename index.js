@@ -10,41 +10,52 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ===============================
-// 🔑 VARIÁVEIS DE AMBIENTE
-// ===============================
 const PAYEVO_SECRET = process.env.PAYEVO_SECRET_KEY;
 const PAYEVO_COMPANY = process.env.PAYEVO_COMPANY_ID;
 
-// 👉 Base oficial da PayEvo V2
 const PAYEVO_BASE = "https://apiv2.payevo.com.br/functions/v1";
 
-// ===============================
-// 🔐 AUTENTICAÇÃO (Basic Auth)
-// ===============================
+// Auth PayEvo
 function basicAuth() {
-  return "Basic " + Buffer.from(`${PAYEVO_SECRET}`).toString("base64");
+  return "Basic " + Buffer.from(PAYEVO_SECRET).toString("base64");
 }
 
-// ===============================
-// 📌 1. Criar Cobrança PIX (transactions)
-// ===============================
+// =====================================
+// 📌 Criar cobrança PIX
+// =====================================
 app.post("/pix/create", async (req, res) => {
   try {
-    console.log("📥 Recebido do FRONT:", req.body);
+    console.log("📥 Body recebido:", req.body);
 
-    // Aceita tanto req.body.payer quanto req.body direto
     const amount = req.body.amount;
-    const name  = req.body.payer?.name     || req.body.name;
-    const cpf   = req.body.payer?.cpf_cnpj || req.body.cpf;
-    const email = req.body.payer?.email    || req.body.email || null;
-    const phone = req.body.payer?.phone    || req.body.phone || null;
+
+    // Aceita qualquer formato enviado pelo front
+    const name =
+      req.body.payer?.name ||
+      req.body.name;
+
+    const cpf =
+      req.body.payer?.cpf_cnpj ||
+      req.body.payer?.cpf ||
+      req.body.cpf_cnpj ||
+      req.body.cpf;
+
+    const email =
+      req.body.payer?.email ||
+      req.body.email ||
+      null;
+
+    const phone =
+      req.body.payer?.phone ||
+      req.body.phone ||
+      null;
 
     if (!amount || !name || !cpf) {
-      return res.status(400).json({ error: "amount, name e cpf são obrigatórios" });
+      return res.status(400).json({
+        error: "amount, name e cpf são obrigatórios"
+      });
     }
 
-    // Corpo oficial para PayEvo V2 — PIX
     const body = {
       amount: Number(amount),
       payment_type: "pix",
@@ -52,7 +63,7 @@ app.post("/pix/create", async (req, res) => {
       company_id: PAYEVO_COMPANY,
       payer: {
         name,
-        cpf_cnpj: cpf,
+        cpf_cnpj: String(cpf), // <--- GARANTE QUE NÃO É undefined
         email,
         phone
       }
@@ -85,18 +96,18 @@ app.post("/pix/create", async (req, res) => {
   }
 });
 
-// ===============================
-// 📌 2. Consultar status de um pagamento
-// ===============================
+// =====================================
+// 📌 Consultar status
+// =====================================
 app.post("/pix/status", async (req, res) => {
   try {
     const { txid } = req.body;
 
     if (!txid) {
-      return res.status(400).json({ error: "txid obrigatório" });
+      return res.status(400).json({
+        error: "txid obrigatório"
+      });
     }
-
-    console.log(`📥 Consultando status do TXID: ${txid}`);
 
     const response = await axios.get(
       `${PAYEVO_BASE}/transactions/${txid}`,
@@ -107,31 +118,19 @@ app.post("/pix/status", async (req, res) => {
       }
     );
 
-    console.log("📥 Resposta PayEvo (status):", response.data);
-
     return res.json(response.data);
 
   } catch (error) {
-    console.error("❌ ERRO AO CONSULTAR STATUS:", error.response?.data || error.message);
-
     return res.status(500).json({
-      error: "Erro ao consultar status PIX",
+      error: "Erro ao consultar status",
       details: error.response?.data || error.message
     });
   }
 });
 
-// ===============================
-// 🩺 Healthcheck
-// ===============================
 app.get("/", (req, res) => {
-  res.send("🔥 Backend PayEvo V2 ativo!");
+  res.send("🔥 Backend PayEvo V2 rodando!");
 });
 
-// ===============================
-// 🚀 SERVIDOR
-// ===============================
 const port = process.env.PORT || 8080;
-app.listen(port, () =>
-  console.log(`🔥 PayEvo backend rodando na porta ${port}`)
-);
+app.listen(port, () => console.log(`🔥 Servidor rodando na porta ${port}`));
