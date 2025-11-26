@@ -7,16 +7,20 @@ dotenv.config();
 
 const app = express();
 
-// 🔥 CORS LIBERADO
+// 🔥 CORS COMPLETO COM SUPORTE A OPTIONS
 app.use(cors({
   origin: "*",
-  methods: ["GET", "POST"],
-  allowedHeaders: ["Content-Type", "Authorization"]
+  methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: false
 }));
 
 // 🔥 OBRIGATÓRIO PARA RECEBER req.body !!!
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+// 🔥 Correção definitiva de CORS + preflight
+app.options("*", cors());  // Responde automaticamente OPTIONS para qualquer rota
+
 
 // 🔑 VARIÁVEIS PAYEVO
 const PAYEVO_SECRET = process.env.PAYEVO_SECRET_KEY;
