@@ -17,7 +17,7 @@ const PAYEVO_BASE = "https://apiv2.payevo.com.br/functions/v1";
 
 // Auth PayEvo
 function basicAuth() {
-  authorization: 'Basic ' + Buffer.from("{SECRET_KEY}:x").toString('base64')
+  authorization: 'Basic ' + Buffer.from("{sk_like_B2F9PTs9d7XURxM9ByT1oQ33Tr8SFNbgxWMA6ndCCUPQ9AYx}:x").toString('base64')
     }
 }
 
