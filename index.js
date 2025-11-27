@@ -7,8 +7,18 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: "*",
+    methods: ["GET", "POST", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
+app.options("*", cors());
+
 app.use(express.json());
+
 
 const PAYEVO_SECRET = process.env.PAYEVO_SECRET_KEY;
 const PAYEVO_COMPANY = process.env.PAYEVO_COMPANY_ID;
