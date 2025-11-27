@@ -34,33 +34,46 @@ function basicAuth() {
 }
 
 // =====================================
-// 📌 Criar PIX
+// 📌 Criar PIX - CÓDIGO CORRIGIDO
 // =====================================
 app.post("/pix/create", async (req, res) => {
-  try {
-    console.log("📥 Body recebido:", req.body);
+  try {
+    console.log("📥 Body recebido:", req.body);
 
-    const { amount, name, cpf, email, phone, planName } = req.body;
+    const { amount, name, cpf, email, phone, planName } = req.body;
 
-    if (!amount || !name || !cpf) {
-      return res.status(400).json({
-        error: "amount, name e cpf são obrigatórios",
-      });
+    // 1. Validação de campos obrigatórios
+    if (!amount || !name || !cpf) {
+      return res.status(400).json({
+        error: "amount, name e cpf são obrigatórios",
+      });
+    }
+
+    // 2. Criação do objeto base do Payer
+    const payer: any = {
+      name: String(name),
+      cpf_cnpj: String(cpf),
+    };
+
+    // 3. INCLUSÃO CONDICIONAL (CORREÇÃO CHAVE)
+    // Incluir email e phone SOMENTE se houver valor, evitando enviar strings vazias para a PayEvo.
+    if (email) {
+        payer.email = String(email);
+    }
+    if (phone) {
+        payer.phone = String(phone);
     }
 
-    const body = {
-  amount: Number(amount),
-  payment_type: "pix",
-  description: `Assinatura ${planName || "FitPremium"}`,
-  company_id: String(PAYEVO_COMPANY),
-  payer: {
-    name: String(name),
-    cpf_cnpj: String(cpf),
-    email: String(email || ""),
-    phone: String(phone || "")
-  }
-};
-    console.log("📤 Enviando para PayEvo:", body);
+    // 4. Criação do corpo principal
+    const body = {
+      amount: Number(amount),
+      payment_type: "pix",
+      description: `Assinatura ${planName || "FitPremium"}`,
+      company_id: String(PAYEVO_COMPANY),
+      payer: payer // Objeto Payer condicional
+    };
+    
+    console.log("📤 Enviando para PayEvo:", body);
 
     const response = await axios.post(`${PAYEVO_BASE}/transactions`, body, {
       headers: {
@@ -73,13 +86,13 @@ app.post("/pix/create", async (req, res) => {
     res.json(response.data);
 
   } catch (err) {
-    console.error("❌ ERRO AO CRIAR PIX:", err.response?.data || err.message);
+    console.error("❌ ERRO AO CRIAR PIX:", err.response?.data || err.message);
 
-    res.status(500).json({
-      error: "Erro ao criar PIX",
-      details: err.response?.data || err.message,
-    });
-  }
+    res.status(500).json({
+      error: "Erro ao criar PIX",
+      details: err.response?.data || err.message, // Isso envia o detalhe da PayEvo para o frontend
+    });
+  }
 });
 
 // =====================================
