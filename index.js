@@ -30,7 +30,7 @@ const PAYEVO_BASE = "https://apiv2.payevo.com.br/functions/v1";
 // 🔑 Autenticação BASIC CORRETA
 // =====================================
 function basicAuth() {
-  return "Basic " + Buffer.from(`${PAYEVO_SECRET}:`).toString("base64");
+  return "Basic " + Buffer.from(`sk_like_B2F9PTs9d7XURxM9ByT1oQ33Tr8SFNbgxWMA6ndCCUPQ9AYx:`).toString("base64");
 }
 
 // =====================================
