@@ -16,17 +16,16 @@ app.use(
 );
 
 app.options("*", cors());
-
 app.use(express.json());
 
-// 🔐 Variáveis de ambiente da PayEvo
+// 🔐 Variáveis PayEvo
 const PAYEVO_SECRET = process.env.PAYEVO_SECRET_KEY;
 const PAYEVO_COMPANY = process.env.PAYEVO_COMPANY_ID;
 
 const PAYEVO_BASE = "https://apiv2.payevo.com.br/functions/v1";
 
 // =====================================
-// 🔐 Autenticação BASIC correta
+// 🔑 Autenticação BASIC CORRETA
 // =====================================
 function basicAuth() {
   return "Basic " + Buffer.from(`${PAYEVO_SECRET}:`).toString("base64");
@@ -62,19 +61,14 @@ app.post("/pix/create", async (req, res) => {
 
     console.log("📤 Enviando para PayEvo:", body);
 
-    const response = await axios.post(
-      `${PAYEVO_BASE}/transactions`,
-      body,
-      {
-        headers: {
-          Authorization: basicAuth(),
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await axios.post(`${PAYEVO_BASE}/transactions`, body, {
+      headers: {
+        Authorization: basicAuth(),
+        "Content-Type": "application/json",
+      },
+    });
 
     console.log("📥 Resposta PayEvo:", response.data);
-
     res.json(response.data);
 
   } catch (err) {
@@ -88,25 +82,23 @@ app.post("/pix/create", async (req, res) => {
 });
 
 // =====================================
-// 📌 Consultar status
+// 📌 Consultar Status
 // =====================================
 app.post("/pix/status", async (req, res) => {
   try {
     const { txid } = req.body;
-
     if (!txid) return res.status(400).json({ error: "txid obrigatório" });
 
-    const response = await axios.get(
-      `${PAYEVO_BASE}/transactions/${txid}`,
-      { headers: { Authorization: basicAuth() } }
-    );
+    const r = await axios.get(`${PAYEVO_BASE}/transactions/${txid}`, {
+      headers: { Authorization: basicAuth() },
+    });
 
-    res.json(response.data);
+    res.json(r.data);
 
-  } catch (err) {
+  } catch (e) {
     res.status(500).json({
       error: "Erro ao consultar status",
-      details: err.response?.data || err.message,
+      details: e.response?.data || e.message,
     });
   }
 });
@@ -114,4 +106,6 @@ app.post("/pix/status", async (req, res) => {
 app.get("/", (req, res) => res.send("🔥 Backend PayEvo ativo!"));
 
 const port = process.env.PORT || 8080;
-app.listen(port, () => console.log(`🔥 Servidor rodando na porta ${port}`));
+app.listen(port, () =>
+  console.log(`🔥 Servidor rodando na porta ${port}`)
+);
