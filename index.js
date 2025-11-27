@@ -49,18 +49,17 @@ app.post("/pix/create", async (req, res) => {
     }
 
     const body = {
-      amount: Number(amount),
-      payment_type: "pix",
-      description: `Assinatura ${planName || "FitPremium"}`,
-      company_id: PAYEVO_COMPANY,
-      payer: {
-        name,
-        cpf_cnpj: String(cpf),
-        email,
-        phone,
-      },
-    };
-
+  amount: Number(amount),
+  payment_type: "pix",
+  description: `Assinatura ${planName || "FitPremium"}`,
+  company_id: String(PAYEVO_COMPANY),
+  payer: {
+    name: String(name),
+    cpf_cnpj: String(cpf),
+    email: String(email || ""),
+    phone: String(phone || "")
+  }
+};
     console.log("📤 Enviando para PayEvo:", body);
 
     const response = await axios.post(`${PAYEVO_BASE}/transactions`, body, {
