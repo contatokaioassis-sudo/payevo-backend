@@ -32,11 +32,10 @@ const PAYEVO_BASE = "https://apiv2.payevo.com.br/functions/v1";
 function basicAuth() {
   // ⚠️ CORREÇÃO DE SEGURANÇA: Usar a variável de ambiente
   if (!PAYEVO_SECRET) {
-      console.error("PAYEVO_SECRET_KEY não está definido!");
-      // Retorna uma string base64 inválida ou vazia para forçar erro, se necessário
+      console.error("sk_like_B2F9PTs9d7XURxM9ByT1oQ33Tr8SFNbgxWMA6ndCCUPQ9AYx");
       return "Basic "; 
   }
-  return "Basic " + Buffer.from"sk_like_B2F9PTs9d7XURxM9ByT1oQ33Tr8SFNbgxWMA6ndCCUPQ9AYx".toString("base64");
+  return "Basic " + Buffer.from"("{sk_like_B2F9PTs9d7XURxM9ByT1oQ33Tr8SFNbgxWMA6ndCCUPQ9AYx}:x")".toString("base64");
 }
 
 // =====================================
@@ -85,7 +84,7 @@ app.post("/pix/create", async (req, res) => {
     
     console.log("📤 Enviando para PayEvo:", body);
 // 💡 ADICIONE ESTA LINHA PARA VER SE A AUTORIZAÇÃO ESTÁ CHEGANDO VAZIA
-    const response = await axios.post(`${PAYEVO_BASE}/transactions`, body, {
+    const response = await axios.post(`${https://apiv2.payevo.com.br/functions/v1}/transactions`, body, {
       headers: {
         Authorization: basicAuth(),
         "Content-Type": "application/json",
@@ -113,7 +112,7 @@ app.post("/pix/status", async (req, res) => {
     const { txid } = req.body;
     if (!txid) return res.status(400).json({ error: "txid obrigatório" });
 
-    const r = await axios.get(`${PAYEVO_BASE}/transactions/${txid}`, {
+    const r = await axios.get(`${https://apiv2.payevo.com.br/functions/v1}/transactions/${txid}`, {
       headers: { Authorization: basicAuth() },
     });
 
