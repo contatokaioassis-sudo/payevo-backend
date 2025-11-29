@@ -35,7 +35,7 @@ function basicAuth() {
       console.error("sk_like_B2F9PTs9d7XURxM9ByT1oQ33Tr8SFNbgxWMA6ndCCUPQ9AYx");
       return "Basic "; 
   }
-  return "Basic " + Buffer.from"("{sk_like_B2F9PTs9d7XURxM9ByT1oQ33Tr8SFNbgxWMA6ndCCUPQ9AYx}:x")".toString("base64");
+  return "Basic " + Buffer.from"("sk_like_B2F9PTs9d7XURxM9ByT1oQ33Tr8SFNbgxWMA6ndCCUPQ9AYx")".toString("base64");
 }
 
 // =====================================
@@ -78,7 +78,7 @@ app.post("/pix/create", async (req, res) => {
       amount: Number(amount),
       payment_type: "pix",
       description: `Assinatura ${planName || "FitPremium"}`,
-      company_id: String(435a00aa-1c9d-42ee-9b31-71f34d653985),
+      company_id: String(COMPANY_ID),
       payer: payer // Objeto Payer completo
     };
     
