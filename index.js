@@ -32,10 +32,11 @@ const PAYEVO_BASE = "https://apiv2.payevo.com.br/functions/v1";
 function basicAuth() {
   // ⚠️ CORREÇÃO DE SEGURANÇA: Usar a variável de ambiente
   if (!PAYEVO_SECRET) {
-      console.error("sk_like_B2F9PTs9d7XURxM9ByT1oQ33Tr8SFNbgxWMA6ndCCUPQ9AYx");
+      console.error("PAYEVO_SECRET_KEY não está definido!");
+      // Retorna uma string base64 inválida ou vazia para forçar erro, se necessário
       return "Basic "; 
   }
-  return "Basic " + Buffer.from"("sk_like_B2F9PTs9d7XURxM9ByT1oQ33Tr8SFNbgxWMA6ndCCUPQ9AYx")".toString("base64");
+  return "Basic " + Buffer.from(`${PAYEVO_SECRET}:`).toString("base64");
 }
 
 // =====================================
@@ -78,13 +79,13 @@ app.post("/pix/create", async (req, res) => {
       amount: Number(amount),
       payment_type: "pix",
       description: `Assinatura ${planName || "FitPremium"}`,
-      company_id: String(COMPANY_ID),
+      company_id: String(PAYEVO_COMPANY),
       payer: payer // Objeto Payer completo
     };
     
     console.log("📤 Enviando para PayEvo:", body);
-// 💡 ADICIONE ESTA LINHA PARA VER SE A AUTORIZAÇÃO ESTÁ CHEGANDO VAZIA
-    const response = await axios.post(`${https://apiv2.payevo.com.br/functions/v1}/transactions`, body, {
+
+    const response = await axios.post(`${PAYEVO_BASE}/transactions`, body, {
       headers: {
         Authorization: basicAuth(),
         "Content-Type": "application/json",
@@ -112,7 +113,7 @@ app.post("/pix/status", async (req, res) => {
     const { txid } = req.body;
     if (!txid) return res.status(400).json({ error: "txid obrigatório" });
 
-    const r = await axios.get(`${https://apiv2.payevo.com.br/functions/v1}/transactions/${txid}`, {
+    const r = await axios.get(`${PAYEVO_BASE}/transactions/${txid}`, {
       headers: { Authorization: basicAuth() },
     });
 
