@@ -36,7 +36,7 @@ function basicAuth() {
       // Retorna uma string base64 inválida ou vazia para forçar erro, se necessário
       return "Basic "; 
   }
-  return "Basic " + Buffer.from("sk_like_B2F9PTs9d7XURxM9ByT1oQ33Tr8SFNbgxWMA6ndCCUPQ9AYx").toString("base64");
+  return "Basic " + Buffer.from"sk_like_B2F9PTs9d7XURxM9ByT1oQ33Tr8SFNbgxWMA6ndCCUPQ9AYx".toString("base64");
 }
 
 // =====================================
