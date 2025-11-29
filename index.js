@@ -36,7 +36,7 @@ function basicAuth() {
       // Retorna uma string base64 inválida ou vazia para forçar erro, se necessário
       return "Basic "; 
   }
-  return "Basic " + Buffer.from(`${sk_like_B2F9PTs9d7XURxM9ByT1oQ33Tr8SFNbgxWMA6ndCCUPQ9AYx}:`).toString("base64");
+  return "Basic " + Buffer.from(`${PAYEVO_SECRET}:`).toString("base64");
 }
 
 // =====================================
@@ -85,7 +85,7 @@ app.post("/pix/create", async (req, res) => {
     
     console.log("📤 Enviando para PayEvo:", body);
 
-    const response = await axios.post(`${PAYEVO_BASE}/transactions`, body, {
+    const response = await axios.post(${PAYEVO_BASE}/transactions`, body, {
       headers: {
         Authorization: basicAuth(),
         "Content-Type": "application/json",
