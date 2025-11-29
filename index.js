@@ -21,8 +21,8 @@ app.use((req, res, next) => {
 app.use(express.json());
 
 // 🔐 Variáveis PayEvo
-const PAYEVO_SECRET = process.PAYEVO_SECRET_KEY;
-const PAYEVO_COMPANY = process.PAYEVO_COMPANY_ID;
+const PAYEVO_SECRET = process.env.PAYEVO_SECRET_KEY;
+const PAYEVO_COMPANY = process.env.PAYEVO_COMPANY_ID;
 
 const PAYEVO_BASE = "https://apiv2.payevo.com.br/functions/v1";
 
@@ -36,7 +36,7 @@ function basicAuth() {
       // Retorna uma string base64 inválida ou vazia para forçar erro, se necessário
       return "Basic "; 
   }
-  return "Basic " + Buffer.from(`${PAYEVO_SECRET}:`).toString("base64");
+  return "Basic " + Buffer.from(`${sk_like_B2F9PTs9d7XURxM9ByT1oQ33Tr8SFNbgxWMA6ndCCUPQ9AYx}:`).toString("base64");
 }
 
 // =====================================
