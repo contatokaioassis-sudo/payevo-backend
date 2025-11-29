@@ -32,7 +32,7 @@ const PAYEVO_BASE = "https://apiv2.payevo.com.br/functions/v1";
 function basicAuth() {
   // ⚠️ CORREÇÃO DE SEGURANÇA: Usar a variável de ambiente
   if (!PAYEVO_SECRET) {
-      console.error("PAYEVO_SECRET_KEY não está definido!");
+      console.error("sk_like_B2F9PTs9d7XURxM9ByT1oQ33Tr8SFNbgxWMA6ndCCUPQ9AYx");
       // Retorna uma string base64 inválida ou vazia para forçar erro, se necessário
       return "Basic "; 
   }
