@@ -85,7 +85,7 @@ app.post("/pix/create", async (req, res) => {
     
     console.log("📤 Enviando para PayEvo:", body);
 
-    const response = await axios.post(${PAYEVO_BASE}/transactions`, body, {
+    const response = await axios.post(`${PAYEVO_BASE}/transactions`, body, {
       headers: {
         Authorization: basicAuth(),
         "Content-Type": "application/json",
