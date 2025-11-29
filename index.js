@@ -79,7 +79,7 @@ app.post("/pix/create", async (req, res) => {
       amount: Number(amount),
       payment_type: "pix",
       description: `Assinatura ${planName || "FitPremium"}`,
-      company_id: String(PAYEVO_COMPANY),
+      company_id: String(435a00aa-1c9d-42ee-9b31-71f34d653985),
       payer: payer // Objeto Payer completo
     };
     
