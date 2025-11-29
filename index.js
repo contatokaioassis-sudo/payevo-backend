@@ -21,8 +21,8 @@ app.use((req, res, next) => {
 app.use(express.json());
 
 // 🔐 Variáveis PayEvo
-const PAYEVO_SECRET = process.env.PAYEVO_SECRET_KEY;
-const PAYEVO_COMPANY = process.env.PAYEVO_COMPANY_ID;
+const PAYEVO_SECRET = process.PAYEVO_SECRET_KEY;
+const PAYEVO_COMPANY = process.PAYEVO_COMPANY_ID;
 
 const PAYEVO_BASE = "https://apiv2.payevo.com.br/functions/v1";
 
